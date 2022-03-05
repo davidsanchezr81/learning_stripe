@@ -2,9 +2,13 @@ require('dotenv').config();
 
 const express = require('express');
 const app = express();
+const cors = require('cors');
 
 app.use(express.json());
-app.use(express.static("public"));
+app.use(cors({
+    origin: "http://localhost:5500",
+})
+);
 
 console.log(process.env.STRIPE_PRIVATE_KEY);
 const stripe = require('stripe')('sk_test_51KXWvhA9iG0xp7uEB1IaVKAMfSL5SLNiE00PdBm6CG3GFv3b0VfN3SJu5vMyaEgSIGxbOQRzStll8QY31wrYRxei000UBzfQTh')
@@ -25,8 +29,8 @@ app.post('/create-checkout-session', async (req, res) => {
                 const storeItem = storeItems.get(item.id)
                 return { price_data: { currency: 'usd', product_data: { name: storeItem.name }, unit_amount: storeItem.priceInCents }, quantity: item.quantity }
             }),
-            success_url: `${"http://localhost:3000"}/success.html`,
-            cancel_url: `${"http://localhost:3000"}/cancel.html`,
+            success_url: `${"http://localhost:5500/client"}/success.html`,
+            cancel_url: `${"http://localhost:5500/client"}/cancel.html`,
         })
 
         res.json({ url: session.url })
